@@ -310,12 +310,13 @@ vec4 gradient_fill(float position) {
 
 void main() {
     float aa = max(u_softness, 0.85);
+    float corner_aa = max(u_softness * 0.55, 0.55);
     vec2 local_point = v_pixel;
     vec2 uv = clamp(local_point / u_rect_size, vec2(0.0), vec2(1.0));
 
     vec2 outer = shape_distance_with_corner(local_point, u_rect_size, u_radii, u_corner_shapes, u_logical_inset);
     float outer_distance = outer.x;
-    float outer_coverage = coverage_for(outer, aa);
+    float outer_coverage = coverage_for(outer, corner_aa);
     if (u_invert_fill == 1) outer_coverage = 1.0 - outer_coverage;
 
     if (u_outer_shadow == 1) {
@@ -368,7 +369,7 @@ void main() {
         vec4 inner_inset = max(u_logical_inset - vec4(u_border_width), vec4(0.0));
         inner = shape_distance_with_corner(inner_point, inner_size, inner_radii, u_corner_shapes, inner_inset);
     }
-    float inner_coverage = coverage_for(inner, aa);
+    float inner_coverage = coverage_for(inner, corner_aa);
 
     if (fill_base.a <= 0.0) {
         float ring_coverage = outer_coverage * (1.0 - inner_coverage);
