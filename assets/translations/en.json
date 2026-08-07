@@ -3417,6 +3417,10 @@
           "description": "Default inherits the bar font weight",
           "label": "Font Weight"
         },
+        "font-scale": {
+          "description": "Scale multiplier for text in this widget, independent of the widget's overall scale",
+          "label": "Font Scale"
+        },
         "format": {
           "description": "Time format string",
           "label": "Format"

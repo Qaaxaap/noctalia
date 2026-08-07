@@ -387,6 +387,7 @@ struct CommonWidgetOptions {
   bool anchor = false;
   bool interactive = true;
   float contentScale = 1.0F;
+  float fontScale = 1.0F;
   std::optional<ColorSpec> color;
   std::optional<ColorSpec> iconColor;
   std::optional<std::int64_t> labelFontWeight;
@@ -447,6 +448,8 @@ capsuleGroupRefsForMonitorScope(const BarConfig& bar, const BarMonitorOverride& 
 );
 [[nodiscard]] float
 resolveWidgetContentScale(float barScale, const WidgetConfig* widget, std::string_view context = "widget.scale");
+[[nodiscard]] float
+resolveWidgetFontScale(float barScale, const WidgetConfig* widget, std::string_view context = "widget.scale");
 
 // Shared output selector matching used by monitor-scoped config and IPC selectors.
 // Matches connector name exactly, or a word-boundary token within output description.
