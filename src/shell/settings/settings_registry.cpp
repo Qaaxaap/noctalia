@@ -3007,6 +3007,11 @@ namespace settings {
           SliderSetting{bar.scale, 0.5F, 4.0F, 0.05F, false}, "zoom size"
       ));
       entries.push_back(makeEntry(
+          section, "layout", tr("settings.schema.bar.font-scale.label"),
+          tr("settings.schema.bar.font-scale.description"), path("font_scale"),
+          SliderSetting{bar.fontScale, 0.2F, 2.5F, 0.01F, false}, "text zoom size"
+      ));
+      entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.ends-margin.label"),
           tr("settings.schema.bar.ends-margin.description"), path("margin_ends"), barMarginStepper(bar.marginEnds),
           "gap inset"
