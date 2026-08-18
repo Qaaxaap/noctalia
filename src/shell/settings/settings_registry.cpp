@@ -534,6 +534,11 @@ namespace settings {
         "rounded corners radius"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Appearance, "interface", tr("settings.schema.appearance.scrollbar-width.label"),
+        tr("settings.schema.appearance.scrollbar-width.description"), {"shell", "scrollbar_width"},
+        sliderFor(cfg.shell.scrollbarWidth, noctalia::config::schema::kScrollbarWidthRange, true), "scrollbar width"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Appearance, "interface", tr("settings.schema.appearance.app-icon-colorize.label"),
         tr("settings.schema.appearance.app-icon-colorize.description"), {"shell", "app_icon_colorize"},
         ToggleSetting{cfg.shell.appIconColorize}, "tint all application icons"

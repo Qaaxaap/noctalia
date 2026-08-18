@@ -477,20 +477,32 @@ void Application::initStyleThemeAndWayland() {
     motion.setSpeed(m_configService.config().shell.animation.speed);
     motion.setEnabled(m_configService.config().shell.animation.enabled);
   };
-  auto applyStyleConfig = [this, lastCornerRadiusScale = std::numeric_limits<float>::quiet_NaN()]() mutable {
+  auto applyStyleConfig = [this, lastCornerRadiusScale = std::numeric_limits<float>::quiet_NaN(),
+                           lastScrollbarWidth = std::numeric_limits<float>::quiet_NaN()]() mutable {
     const float corner = m_configService.config().shell.cornerRadiusScale;
     const bool cornerChanged =
         std::isfinite(lastCornerRadiusScale) && std::abs(corner - lastCornerRadiusScale) > 1.0e-4F;
+    const float scrollbarWidth = static_cast<float>(m_configService.config().shell.scrollbarWidth)
+        * m_configService.config().accessibility.uiScale;
+    const bool scrollbarWidthChanged =
+        std::isfinite(lastScrollbarWidth) && std::abs(scrollbarWidth - lastScrollbarWidth) > 1.0e-4F;
     Style::setCornerRadiusScale(corner);
+    Style::setScrollbarWidth(scrollbarWidth);
     Style::setButtonBordersEnabled(m_configService.config().shell.buttonBorders);
     Style::setInputBordersEnabled(m_configService.config().shell.inputBorders);
     Style::setPopupBordersEnabled(m_configService.config().shell.popupBorders);
     Style::setPopupShadowsEnabled(m_configService.config().shell.popupShadows);
     Style::setCardBordersEnabled(m_configService.config().shell.cardBorders);
     lastCornerRadiusScale = corner;
+    lastScrollbarWidth = scrollbarWidth;
     if (cornerChanged) {
       m_notificationToast.requestLayout();
       m_panelManager.requestLayout();
+    }
+    if (scrollbarWidthChanged) {
+      m_notificationToast.requestLayout();
+      m_panelManager.requestLayout();
+      m_settingsWindow.onExternalOptionsChanged();
     }
   };
   auto applyPasswordMaskStyle = [this]() {

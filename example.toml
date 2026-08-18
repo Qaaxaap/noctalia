@@ -10,6 +10,7 @@ high_contrast         = false
 
 [shell]
 corner_radius_scale   = 1.0          # 0 = square, 1 = default, 2 = extra rounded
+scrollbar_width       = 6            # scrollbar thickness in pixels (before accessibility.ui_scale)
 font_family           = "sans-serif"
 time_format           = "{:%H:%M}"  # default shell UI time format
 date_format           = "%A, %x"    # default shell UI date format

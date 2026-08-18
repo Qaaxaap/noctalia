@@ -19,7 +19,7 @@ namespace {
         .fill = fill,
         .border = fill,
         .fillMode = FillMode::Solid,
-        .radius = Style::scrollbarWidth * 0.5F,
+        .radius = Style::scrollbarWidth() * 0.5F,
         .softness = 1.0F,
         .borderWidth = 0.0F,
     };
@@ -125,7 +125,7 @@ void Scrollbar::update(float viewportExtent, float contentExtent, float scrollOf
   }
 
   const float trackExtent = std::max(0.0F, viewportExtent - m_trackInset * 2.0F);
-  const float thickness = Style::scrollbarWidth;
+  const float thickness = Style::scrollbarWidth();
   if (m_orientation == ScrollOrientation::Horizontal) {
     m_track->setPosition(m_trackInset, 0.0F);
     m_track->setFrameSize(trackExtent, thickness);

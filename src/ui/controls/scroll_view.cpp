@@ -315,14 +315,14 @@ void ScrollView::setViewportPaddingV(float padding) {
 
 float ScrollView::contentViewportWidth(bool reserveScrollbarGutter) const noexcept {
   const float gutter = m_orientation == ScrollOrientation::Vertical && (m_scrollbarShown || reserveScrollbarGutter)
-      ? (Style::scrollbarWidth + Style::scrollbarGap)
+      ? (Style::scrollbarWidth() + Style::scrollbarGap)
       : 0.0F;
   return std::max(0.0F, width() - m_viewportPaddingH * 2.0F - gutter);
 }
 
 float ScrollView::contentViewportHeight() const noexcept {
   const float gutter = m_orientation == ScrollOrientation::Horizontal && m_scrollbarShown
-      ? (Style::scrollbarWidth + Style::scrollbarGap)
+      ? (Style::scrollbarWidth() + Style::scrollbarGap)
       : 0.0F;
   return std::max(0.0F, height() - m_viewportPaddingV * 2.0F - gutter);
 }
@@ -361,7 +361,7 @@ void ScrollView::doLayout(Renderer& renderer) {
   if (m_orientation == ScrollOrientation::Horizontal) {
     LayoutSize contentSize = m_content->measure(renderer, {});
     m_scrollbarShown = m_showScrollbar && contentSize.width > availableW + 0.5F;
-    const float gutter = m_scrollbarShown ? (Style::scrollbarWidth + Style::scrollbarGap) : 0.0F;
+    const float gutter = m_scrollbarShown ? (Style::scrollbarWidth() + Style::scrollbarGap) : 0.0F;
     const float contentWidth = std::max(availableW, contentSize.width);
 
     LayoutConstraints contentConstraints;
@@ -404,7 +404,7 @@ void ScrollView::doLayout(Renderer& renderer) {
     m_viewportArea->setFrameSize(availableW, viewportH);
 
     m_scrollbarShown = m_showScrollbar && m_content->height() > viewportH + 0.5F;
-    const float gutter = m_scrollbarShown ? (Style::scrollbarWidth + Style::scrollbarGap) : 0.0F;
+    const float gutter = m_scrollbarShown ? (Style::scrollbarWidth() + Style::scrollbarGap) : 0.0F;
     const float contentWidth = std::max(0.0F, availableW - gutter);
     if (std::abs(m_content->width() - contentWidth) >= 0.5F) {
       contentConstraints = {};
@@ -418,7 +418,7 @@ void ScrollView::doLayout(Renderer& renderer) {
     const float contentHeight = m_content->height();
     m_maxScrollOffset = std::max(0.0F, contentHeight - viewportH);
     const float scrollbarX =
-        Style::rtl() ? m_viewportPaddingH : m_viewportPaddingH + m_viewportWidth - Style::scrollbarWidth;
+        Style::rtl() ? m_viewportPaddingH : m_viewportPaddingH + m_viewportWidth - Style::scrollbarWidth();
     m_scrollbar->setPosition(scrollbarX, m_viewportPaddingV);
     m_scrollbar->setVisible(m_showScrollbar);
     m_scrollbar->update(viewportH, contentHeight, m_scrollOffset);
@@ -464,7 +464,7 @@ void ScrollView::applyScrollOffset() {
     if (m_orientation == ScrollOrientation::Horizontal) {
       m_content->setPosition(-m_scrollOffset, 0.0F);
     } else {
-      const float gutter = Style::rtl() && m_scrollbarShown ? Style::scrollbarWidth + Style::scrollbarGap : 0.0F;
+      const float gutter = Style::rtl() && m_scrollbarShown ? Style::scrollbarWidth() + Style::scrollbarGap : 0.0F;
       m_content->setPosition(gutter, -m_scrollOffset);
     }
   }

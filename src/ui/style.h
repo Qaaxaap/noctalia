@@ -45,7 +45,6 @@ namespace Style {
   // Pointer distance in logical px before an armed drag becomes active.
   inline constexpr float dragStartThreshold = 6.0F;
 
-  inline constexpr float scrollbarWidth = 6.0F;
   inline constexpr float scrollbarGap = spaceSm;
   inline constexpr float scrollbarMinThumbHeight = 24.0F;
 
@@ -71,6 +70,9 @@ namespace Style {
 
   [[nodiscard]] float cornerRadiusScale() noexcept;
   void setCornerRadiusScale(float scale) noexcept;
+
+  [[nodiscard]] float scrollbarWidth() noexcept;
+  void setScrollbarWidth(float width) noexcept;
 
   [[nodiscard]] bool buttonBordersEnabled() noexcept;
   void setButtonBordersEnabled(bool enabled);

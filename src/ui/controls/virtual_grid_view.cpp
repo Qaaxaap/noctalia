@@ -233,7 +233,7 @@ void VirtualGridView::doLayout(Renderer& renderer) {
   const float padV = m_scroll->viewportPaddingV();
   const float innerW = std::max(0.0F, ourW - 2.0F * padH);
   const float viewportH = std::max(0.0F, ourH - 2.0F * padV);
-  const float scrollbarGutter = Style::scrollbarWidth + Style::scrollbarGap;
+  const float scrollbarGutter = Style::scrollbarWidth() + Style::scrollbarGap;
 
   m_itemCount = m_adapter->itemCount();
 

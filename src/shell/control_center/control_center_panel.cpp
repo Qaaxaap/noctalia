@@ -884,7 +884,7 @@ void ControlCenterPanel::layoutFullSidebarWidth(Renderer& renderer) {
     navConstraints.setExactWidth(contentWidth);
     const float navHeight = m_sidebarNav->measure(renderer, navConstraints).height;
     if (navHeight > scrollHeight + 0.5F) {
-      targetWidth = contentWidth + Style::scrollbarWidth + Style::scrollbarGap;
+      targetWidth = contentWidth + Style::scrollbarWidth() + Style::scrollbarGap;
     }
   }
 

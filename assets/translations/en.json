@@ -1594,6 +1594,10 @@
           "description": "Scale corner radius across shell UI containers and controls",
           "label": "Corner Roundness"
         },
+        "scrollbar-width": {
+          "description": "Scrollbar thickness in pixels, before UI scale",
+          "label": "Scrollbar Width"
+        },
         "custom-palette": {
           "description": "Choose a palette from ~/.config/noctalia/palettes/",
           "label": "Custom Palette",

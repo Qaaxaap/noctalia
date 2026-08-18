@@ -1057,6 +1057,7 @@ struct ShellConfig {
   };
 
   float cornerRadiusScale = 1.0F;
+  std::int32_t scrollbarWidth = 6;
   bool buttonBorders = true;
   bool inputBorders = true;
   bool popupBorders = true;
