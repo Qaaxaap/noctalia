@@ -598,6 +598,16 @@ location = "https://example.invalid/bad"
         fail("osd.scale clamp: expected 0.5");
       }
     }
+    // Bar font_scale uses the same lower bound exposed by the Settings slider.
+    {
+      auto t = toml::parse("font_scale = 0.1");
+      BarConfig b{};
+      Diagnostics d;
+      readInto(t, b, barFieldsSchema(), "bar", d);
+      if (b.fontScale != 0.2f) {
+        fail("bar.font_scale clamp: expected 0.2");
+      }
+    }
     // Clipboard history count accepts large text-heavy histories but still has
     // an explicit config ceiling.
     {
@@ -608,6 +618,22 @@ location = "https://example.invalid/bad"
       if (s.clipboardHistoryMaxEntries != 10000) {
         fail("shell.clipboard_history_max_entries clamp: expected 10000");
       }
+    }
+  }
+
+  void checkMonitorFontScaleChangeSet() {
+    Config before;
+    BarConfig bar;
+    bar.name = "default";
+    BarMonitorOverride monitor;
+    monitor.match = "DP-1";
+    bar.monitorOverrides.push_back(monitor);
+    before.bars.push_back(bar);
+
+    Config after = before;
+    after.bars.front().monitorOverrides.front().fontScale = 1.5F;
+    if (!computeConfigChangeSet(before, after).bars) {
+      fail("monitor font_scale override did not mark bars changed");
     }
   }
 
@@ -1071,6 +1097,7 @@ widget_spacing = 8
   checkStorageKeySourceValidation();
   checkPanelFloatingLayerValidation();
   checkClamps();
+  checkMonitorFontScaleChangeSet();
   checkCustomColorFallback();
   checkTemplateConfigCustomColorsExport();
 

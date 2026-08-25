@@ -99,6 +99,7 @@ public:
   [[nodiscard]] float contentScale() const noexcept { return m_contentScale; }
   void setFontScale(float scale) noexcept { m_fontScale = scale; }
   [[nodiscard]] float fontScale() const noexcept { return m_contentScale * m_fontScale; }
+  [[nodiscard]] float fontScaleMultiplier() const noexcept { return m_fontScale; }
   void setLabelFontWeight(FontWeight fontWeight) noexcept { m_labelFontWeight = fontWeight; }
   [[nodiscard]] FontWeight labelFontWeight() const noexcept { return m_labelFontWeight; }
   void setLabelFontFamily(std::string family) noexcept { m_labelFontFamily = std::move(family); }

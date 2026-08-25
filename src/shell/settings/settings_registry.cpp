@@ -3009,7 +3009,7 @@ namespace settings {
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.bar.font-scale.label"),
           tr("settings.schema.bar.font-scale.description"), path("font_scale"),
-          SliderSetting{bar.fontScale, 0.2F, 2.5F, 0.01F, false}, "text zoom size"
+          sliderFor(bar.fontScale, noctalia::config::schema::kBarFontScaleRange, false), "text zoom size"
       ));
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.ends-margin.label"),
@@ -3330,6 +3330,12 @@ namespace settings {
             section, "layout", tr("settings.schema.bar.content-scale.label"),
             tr("settings.schema.bar.content-scale.description"), monitorPath("scale"),
             SliderSetting{ovr.scale.value_or(bar.scale), 0.5F, 4.0F, 0.05F, false}, "zoom size"
+        ));
+        entries.push_back(makeEntry(
+            section, "layout", tr("settings.schema.bar.font-scale.label"),
+            tr("settings.schema.bar.font-scale.description"), monitorPath("font_scale"),
+            sliderFor(ovr.fontScale.value_or(bar.fontScale), noctalia::config::schema::kBarFontScaleRange, false),
+            "text zoom size"
         ));
         entries.push_back(makeEntry(
             section, "layout", tr("settings.schema.shared.ends-margin.label"),
