@@ -23,6 +23,7 @@ namespace {
   constexpr float kBaseHeight = 80.0F;
   constexpr float kGraphLineWidth = 0.75F;
   constexpr double kBytesPerMb = 1000.0 * 1000.0;
+  constexpr double kFreqFallbackCeilingMhz = 5000.0;
 
   [[nodiscard]] ColorSpec gaugeTrackColor(const ColorSpec& fill) {
     ColorSpec track = fill;
@@ -52,7 +53,9 @@ namespace {
   bool needsCpuTemp(DesktopSysmonStat stat) { return stat == DesktopSysmonStat::CpuTemp; }
   bool needsGpuTemp(DesktopSysmonStat stat) { return stat == DesktopSysmonStat::GpuTemp; }
   bool needsGpuUsage(DesktopSysmonStat stat) { return stat == DesktopSysmonStat::GpuUsage; }
-  bool needsGpuVram(DesktopSysmonStat stat) { return stat == DesktopSysmonStat::GpuVram; }
+  bool needsGpuVram(DesktopSysmonStat stat) {
+    return stat == DesktopSysmonStat::GpuVram || stat == DesktopSysmonStat::GpuVramUsed;
+  }
 
   struct GlyphInkBounds {
     float left = 0.0F;
@@ -562,7 +565,7 @@ Color DesktopSysmonWidget::currentValueColor(ColorSpec baseColor) const {
   const Color highlight = resolveColorSpec(m_highlightColor);
   const auto [activityThreshold, criticalThreshold] = currentThresholds();
   const auto factor = static_cast<float>(gradientFactor(currentGradientValue(), activityThreshold, criticalThreshold));
-  return lerpHsv(base, highlight, factor);
+  return lerpHsvChromaWeighted(base, highlight, factor);
 }
 
 std::pair<double, double> DesktopSysmonWidget::currentThresholds() const {
@@ -575,11 +578,14 @@ std::pair<double, double> DesktopSysmonWidget::currentThresholds() const {
     return {monitorConfig.cpuUsageActivityThreshold, monitorConfig.cpuUsageCriticalThreshold};
   case DesktopSysmonStat::CpuTemp:
     return {monitorConfig.cpuTempActivityThreshold, monitorConfig.cpuTempCriticalThreshold};
+  case DesktopSysmonStat::CpuFreq:
+    return {monitorConfig.cpuFreqActivityThreshold, monitorConfig.cpuFreqCriticalThreshold};
   case DesktopSysmonStat::GpuTemp:
     return {monitorConfig.gpuTempActivityThreshold, monitorConfig.gpuTempCriticalThreshold};
   case DesktopSysmonStat::GpuUsage:
     return {monitorConfig.gpuUsageActivityThreshold, monitorConfig.gpuUsageCriticalThreshold};
   case DesktopSysmonStat::GpuVram:
+  case DesktopSysmonStat::GpuVramUsed:
     return {monitorConfig.gpuVramActivityThreshold, monitorConfig.gpuVramCriticalThreshold};
   case DesktopSysmonStat::RamPct:
     return {monitorConfig.ramPctActivityThreshold, monitorConfig.ramPctCriticalThreshold};
@@ -604,11 +610,14 @@ double DesktopSysmonWidget::currentGradientValue() const {
     return std::max(stats.cpuUsagePercent, 0.0);
   case DesktopSysmonStat::CpuTemp:
     return stats.cpuTempC.value_or(0.0);
+  case DesktopSysmonStat::CpuFreq:
+    return stats.cpuFreqAvailable ? stats.cpuFreqMhz / 1000.0 : 0.0;
   case DesktopSysmonStat::GpuTemp:
     return stats.gpuTempC.value_or(0.0);
   case DesktopSysmonStat::GpuUsage:
     return stats.gpuUsagePercent.value_or(0.0);
   case DesktopSysmonStat::GpuVram:
+  case DesktopSysmonStat::GpuVramUsed:
     if (stats.gpuVramUsedBytes.has_value() && stats.gpuVramTotalBytes.has_value() && *stats.gpuVramTotalBytes > 0) {
       return 100.0 * static_cast<double>(*stats.gpuVramUsedBytes) / static_cast<double>(*stats.gpuVramTotalBytes);
     }
@@ -679,6 +688,13 @@ double DesktopSysmonWidget::normalizedFromStats(
     }
     return 0.0;
 
+  case DesktopSysmonStat::CpuFreq: {
+    const double maxMhz = stats.cpuMaxFreqMhz.value_or(0.0);
+    return stats.cpuFreqAvailable
+        ? std::clamp(stats.cpuFreqMhz / (maxMhz > 0.0 ? maxMhz : kFreqFallbackCeilingMhz), 0.0, 1.0)
+        : 0.0;
+  }
+
   case DesktopSysmonStat::GpuTemp:
     if (stats.gpuTempC.has_value()) {
       const double temp = *stats.gpuTempC;
@@ -698,6 +714,7 @@ double DesktopSysmonWidget::normalizedFromStats(
     return 0.0;
 
   case DesktopSysmonStat::GpuVram:
+  case DesktopSysmonStat::GpuVramUsed:
     if (stats.gpuVramUsedBytes.has_value() && stats.gpuVramTotalBytes.has_value() && *stats.gpuVramTotalBytes > 0) {
       return static_cast<double>(*stats.gpuVramUsedBytes) / static_cast<double>(*stats.gpuVramTotalBytes);
     }
@@ -757,6 +774,12 @@ std::string DesktopSysmonWidget::formatValueFor(DesktopSysmonStat stat) const {
     }
     return "--";
 
+  case DesktopSysmonStat::CpuFreq:
+    if (stats.cpuFreqAvailable) {
+      return std::format("{:.1f} GHz", stats.cpuFreqMhz / 1000.0);
+    }
+    return "--";
+
   case DesktopSysmonStat::GpuTemp:
     if (stats.gpuTempC.has_value()) {
       return std::format("{:.0F}°C", *stats.gpuTempC);
@@ -775,6 +798,12 @@ std::string DesktopSysmonWidget::formatValueFor(DesktopSysmonStat stat) const {
           "{:.0F}%",
           100.0 * static_cast<double>(*stats.gpuVramUsedBytes) / static_cast<double>(*stats.gpuVramTotalBytes)
       );
+    }
+    return "--";
+
+  case DesktopSysmonStat::GpuVramUsed:
+    if (stats.gpuVramUsedBytes.has_value()) {
+      return FormatUnits::formatBinaryBytesAsGib(*stats.gpuVramUsedBytes);
     }
     return "--";
 
@@ -881,11 +910,14 @@ const char* DesktopSysmonWidget::glyphName(DesktopSysmonStat stat) {
     return "cpu-usage";
   case DesktopSysmonStat::CpuTemp:
     return "cpu-temperature";
+  case DesktopSysmonStat::CpuFreq:
+    return "performance";
   case DesktopSysmonStat::GpuTemp:
     return "temperature";
   case DesktopSysmonStat::GpuUsage:
     return "gpu-usage";
   case DesktopSysmonStat::GpuVram:
+  case DesktopSysmonStat::GpuVramUsed:
     return "memory";
   case DesktopSysmonStat::RamPct:
     return "memory";

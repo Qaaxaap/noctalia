@@ -93,6 +93,7 @@
       },
       "sysmon": {
         "cpu": "CPU",
+        "cpu-freq": "CPU 频率",
         "cpu-temp": "CPU 温度",
         "disk": "磁盘",
         "disk-free": "磁盘可用空间",
@@ -185,7 +186,7 @@
       "choose-effects-profile": "选择音效预设",
       "effects-profile": "音效",
       "input-device-prefix": "输入",
-      "no-application-audio": "无应用音频",
+      "no-application-audio": "暂无应用音频",
       "no-application-audio-body": "当前没有应用正在播放音频。",
       "no-input-devices": "无输入设备",
       "no-input-devices-body": "当前没有可用的音频输入设备。",
@@ -518,6 +519,7 @@
         "opacity": "不透明度",
         "primary-color": "主色",
         "reset-defaults": "恢复默认设置",
+        "reversed": "反向",
         "ring-opacity": "圆环不透明度",
         "rotation-speed": "旋转速度",
         "scroll-step": "滚动步长",
@@ -526,6 +528,7 @@
         "shadow": "阴影",
         "show-caps-lock": "大写锁定提示",
         "show-device": "显示设备",
+        "show-events": "显示事件",
         "show-forecast": "显示天气预报",
         "show-keyboard-layout": "键盘布局",
         "show-label": "显示标签",
@@ -536,13 +539,16 @@
         "show-unlock-hint": "解锁提示",
         "show-vpn-label": "显示 VPN 标签",
         "show-weather": "天气",
+        "show-week-numbers": "显示周数",
         "show-when-idle": "空闲时显示",
         "stat": "统计项",
+        "stat-cpu-freq": "CPU 频率",
         "stat-cpu-temp": "CPU 温度",
         "stat-cpu-usage": "CPU 使用率",
         "stat-gpu-temp": "GPU 温度",
         "stat-gpu-usage": "GPU 使用率",
         "stat-gpu-vram": "GPU 显存",
+        "stat-gpu-vram-used": "GPU 显存使用量",
         "stat-net-rx": "网络下行",
         "stat-net-tx": "网络上行",
         "stat-none": "无",
@@ -576,6 +582,7 @@
       "types": {
         "audio-visualizer": "音频可视化",
         "button": "按钮",
+        "calendar": "日历",
         "clock": "时钟",
         "fancy-audio-visualizer": "华丽音频可视化",
         "label": "标签",
@@ -643,12 +650,22 @@
     },
     "context-menu": {
       "open": "打开",
+      "pin": "固定到启动器",
       "pin-to-dock": "固定到 Dock",
+      "unpin": "从启动器取消固定",
       "unpin-from-dock": "从 Dock 取消固定"
     },
     "empty": {
       "no-results": "未找到结果",
       "type-to-search": "输入以搜索…"
+    },
+    "origins": {
+      "appimage": "AppImage",
+      "flatpak": "Flatpak",
+      "nix": "Nix",
+      "snap": "Snap",
+      "system": "系统",
+      "user": "用户"
     },
     "providers": {
       "applications": {
@@ -717,6 +734,8 @@
       "battery-low-body": "{device}：剩余 {percent}%",
       "battery-low-title": "电量低",
       "calendar": "日历",
+      "calendar-credential-locked-body": "请解锁 Secret Service 使用的密钥环，然后在“设置”中重试。使用 GNOME Keyring 时，需要将可自动解锁的密钥环（如 Login）设为默认。",
+      "calendar-credential-locked-title": "日历密钥环已锁定",
       "calendar-google-connect-browser-failed": "未找到可用于 Google 授权的浏览器。请检查默认浏览器或 xdg-open 设置。",
       "calendar-google-connect-credential-store-failed": "授权已完成，但无法保存刷新令牌。请解锁或启动 Secret Service，然后重新连接。",
       "calendar-google-connect-expired": "Google 授权在登录完成前已过期。请重新发起连接。",
@@ -727,7 +746,7 @@
       "calendar-google-connect-start-failed": "无法启动 Google 授权。请检查网络连接并重试。",
       "calendar-google-connect-start-http": "无法启动 Google 授权。OAuth 代理返回了 HTTP {status}。",
       "calendar-google-connect-timeout": "Google 授权超时。准备好登录时，请重新发起连接。",
-      "config-migration-body": "旧版配置项已在内存中临时转换，包括 {path}。请更新源配置文件；可在设置界面或执行 noctalia config validate 命令查看所需的替换方案。",
+      "config-migration-body": "请在源配置文件中更新 {path}。Noctalia 仅在内存中临时兼容。执行 noctalia config validate 命令查看所有必需的更改。",
       "config-migration-title": "需要更新配置",
       "dbus-disabled": "DBus 通知已禁用",
       "desktop-widgets-editor": "桌面小组件编辑器",
@@ -881,6 +900,7 @@
       "credential-source-label": "凭据存储",
       "delete-error": "无法删除日历账户。",
       "edit-title": "编辑日历账户",
+      "ics-url-label": "ICS URL",
       "id-label": "账户 ID",
       "invalid": "请检查高亮的日历账户字段。",
       "name-label": "显示名称",
@@ -894,7 +914,8 @@
       "provider": {
         "custom": "CalDAV",
         "google": "Google",
-        "icloud": "iCloud"
+        "icloud": "iCloud",
+        "ics": "ICS URL"
       },
       "provider-label": "提供方",
       "save": "保存",
@@ -1021,7 +1042,8 @@
         "inspector": {
           "add-instance-title": "将新的{widget}具名小组件添加到{lane}",
           "add-title": "将小组件添加到{lane}",
-          "move-to-lane": "移动到{lane}"
+          "move-to-lane": "移动到{lane}",
+          "reset-defaults": "恢复默认设置"
         },
         "instance": {
           "create-save": "创建",
@@ -1107,10 +1129,10 @@
     },
     "export-config": {
       "export": "导出",
-      "full-effective-description": "导出所有当前生效的设置，包括内置默认值。适用于检查配置或分享当前快照，但会将当前默认值显式写入配置。",
+      "full-effective-description": "导出所有生效的设置，包括内置默认值。适用于检查或分享当前快照，但会将默认值也显式写入配置。",
       "full-effective-save-title": "保存所有生效配置",
       "full-effective-title": "所有生效配置",
-      "merged-user-description": "将配置文件与 GUI 覆盖项合并为单个 TOML 文件，仅包含已设置的配置项。",
+      "merged-user-description": "将配置文件与 GUI 覆盖项合并为单个 TOML 文件，仅包含已更改的配置项。",
       "merged-user-save-title": "保存合并后的用户配置",
       "merged-user-title": "合并用户配置（推荐）",
       "title": "导出配置"
@@ -1128,6 +1150,7 @@
           "suspend": "挂起"
         },
         "kind-section-label": "操作",
+        "locked-timeout-label": "锁定状态下的超时秒数（0 = 关闭）",
         "name-label": "名称",
         "name-placeholder": "idle-behavior",
         "resume-command-label": "恢复命令",
@@ -1190,6 +1213,7 @@
         "monitor-thresholds": "高亮阈值",
         "monitors": "屏幕",
         "motion": "动效",
+        "navigation": "导航",
         "network": "网络",
         "night-light": "夜间模式",
         "notifications": "通知",
@@ -1250,7 +1274,9 @@
         "add-title": "添加通知过滤器",
         "allow-permanent": "允许常驻通知",
         "allowed-urgencies-label": "允许的通知级别",
+        "bypass-dnd": "绕过勿扰模式",
         "flag": {
+          "dnd-bypass": "绕过勿扰",
           "history": "历史记录",
           "permanent": "常驻",
           "sound": "提示音",
@@ -1458,8 +1484,6 @@
         "held-back": "较旧版本",
         "held-back-hint": "v{version} 需要插件 API {required}；当前 Noctalia 最高仅支持 API {current}。请升级 Noctalia 以获取该版本。",
         "incompatible-plugin-api": "插件 API 不兼容",
-        "loading": "正在加载插件…",
-        "refreshing": "正在刷新插件…",
         "remove": "移除插件",
         "requires": "依赖：{dependencies}",
         "title": "插件",
@@ -1501,6 +1525,7 @@
       },
       "store": {
         "add": "添加到 Noctalia",
+        "back-to-catalog": "返回插件目录",
         "categories": "类别",
         "category-all": "全部",
         "empty": "未找到插件",
@@ -1641,7 +1666,7 @@
       },
       "bar": {
         "auto-hide": {
-          "description": "“关闭”时保持状态栏可见；“开启”时隐藏，直到将指针移至屏幕边缘；“智能”模式会在空工作区显示，并在有窗口时隐藏。"
+          "description": "“关闭”时保持状态栏可见；“开启”时隐藏，直到将指针移至屏幕边缘；“智能”模式会在空工作区显示，并在有窗口时隐藏"
         },
         "background-opacity": {
           "description": "状态栏的背景不透明度"
@@ -1651,7 +1676,7 @@
           "label": "边框"
         },
         "border-width": {
-          "description": "状态栏的内部轮廓宽度",
+          "description": "状态栏内部轮廓的宽度",
           "label": "边框宽度"
         },
         "capsule-border": {
@@ -1866,7 +1891,7 @@
           "label": "仅当前屏幕应用"
         },
         "auto-hide": {
-          "description": "“关闭”时保持 Dock 可见；“开启”时隐藏，直到将指针移至屏幕边缘；“智能”模式会在空工作区显示，并在有窗口时隐藏。"
+          "description": "“关闭”时保持 Dock 可见；“开启”时隐藏，直到将指针移至屏幕边缘；“智能”模式会在空工作区显示，并在有窗口时隐藏"
         },
         "background-opacity": {
           "description": "Dock 的背景不透明度"
@@ -1876,7 +1901,7 @@
           "label": "边框"
         },
         "border-width": {
-          "description": "Dock 的内部轮廓宽度",
+          "description": "Dock 内部轮廓的宽度",
           "label": "边框宽度"
         },
         "concave-edge-corners": {
@@ -2199,11 +2224,15 @@
         },
         "history-retention-hours": {
           "description": "自动移除超过指定小时的通知历史记录条目（设为 0 时永久保留）",
-          "label": "历史记录保留时长"
+          "label": "保留时长"
         },
         "layer": {
           "description": "使用 Overlay 可使 Toast 通知显示在全屏应用上方，Top 则在全屏时被覆盖",
           "label": "Wayland 层级"
+        },
+        "max-visible": {
+          "description": "屏幕上同时显示的 Toast 通知上限（设为 0 时占满可用空间）",
+          "label": "最大 Toast 通知数"
         },
         "monitors": {
           "description": "选择显示 Toast 通知的屏幕；留空时在所有屏幕上显示",
@@ -2267,6 +2296,10 @@
           "description": "悬浮或独立面板与状态栏边缘的间距（像素）",
           "label": "悬浮间距"
         },
+        "home-session-button": {
+          "description": "在主页选项卡顶部显示会话操作按钮",
+          "label": "显示顶部会话按钮"
+        },
         "home-shortcuts": {
           "description": "为主页选项卡选择最多六个快捷按钮",
           "label": "主页快捷项"
@@ -2274,6 +2307,10 @@
         "home-shortcuts-show-labels": {
           "description": "在主页选项卡的快捷项图标下方显示文本标签",
           "label": "显示快捷项标签"
+        },
+        "launcher-app-actions": {
+          "description": "在搜索结果中同时显示应用及其操作项",
+          "label": "显示应用操作"
         },
         "launcher-app-grid": {
           "description": "当搜索结果仅包含应用时，以网格形式显示应用图标，并在图标下方显示名称",
@@ -2314,6 +2351,10 @@
         "launcher-global-windows": {
           "description": "在无前缀搜索中显示打开的窗口",
           "label": "全局搜索中的窗口"
+        },
+        "launcher-pinned-apps": {
+          "description": "固定到启动器的应用桌面项 ID；打开启动器时优先显示",
+          "label": "已固定应用"
         },
         "launcher-prefix-calculator": {
           "description": "触发计算器计算的前缀",
@@ -2469,24 +2510,26 @@
         },
         "calendar-add": {
           "button": "添加账户",
-          "description": "添加 iCloud、CalDAV 或 Google 账户",
+          "description": "添加 iCloud、CalDAV、Google 账户或 ICS URL",
           "label": "日历账户"
         },
         "calendar-credentials": {
           "button": "重试",
-          "description-cancelled": "Secret Service 解锁提示已取消。请在准备好时重试。",
-          "description-error": "无法通过 Secret Service 访问日历凭据。",
-          "description-locked": "日历凭据已锁定或访问被拒绝。请解锁 Secret Service 后重试。",
-          "description-migration": "明文日历凭据正等待迁移到 Secret Service，迁移前不会用于日历同步。",
-          "description-opening": "正在通过 Secret Service 访问日历凭据。",
-          "description-unavailable": "当前会话中没有可用的 Secret Service 提供程序。",
+          "description-cancelled": "Secret Service 解锁提示已取消；请在准备好时重试",
+          "description-error": "无法通过 Secret Service 访问日历凭据",
+          "description-locked": "日历凭据已锁定或访问被拒绝；请解锁 Secret Service 后重试",
+          "description-migration": "明文日历凭据正等待迁移到 Secret Service；迁移前不会用于日历同步",
+          "description-opening": "正在通过 Secret Service 访问日历凭据",
+          "description-unavailable": "当前会话中没有可用的 Secret Service 提供程序",
           "label": "日历凭据存储"
         },
         "calendar-edit": {
           "button": "编辑",
           "button-reconnect": "重新连接",
+          "button-retry": "重试",
           "description": "更新日历账户",
-          "description-reconnect": "未找到 Google 授权信息。请重新连接此账户。"
+          "description-locked": "刷新令牌位于已锁定的密钥环中；请解锁密钥环后重试",
+          "description-reconnect": "未找到 Google 授权信息；请重新连接此账户"
         },
         "calendar-event-date-format": {
           "description": "事件卡片中所选日期的显示格式",
@@ -2502,14 +2545,14 @@
         },
         "calendar-storage": {
           "button": "重试",
-          "description-cancelled": "加密存储提示已取消。日历事件仅在本次会话中可用。",
-          "description-error": "无法打开或保存加密的日历事件缓存。",
-          "description-locked": "加密存储已锁定或访问被拒绝。请恢复访问后重试。",
-          "description-migration": "明文日历事件缓存正等待加密。迁移成功前，现有缓存将继续保留。",
-          "description-missing-key": "未找到日历事件缓存密钥。账户凭据使用独立存储；现有缓存文件已保留。",
-          "description-opening": "正在打开加密的日历事件缓存。",
-          "description-recovery": "日历事件缓存验证失败或已损坏。请恢复正确的密钥后重试，或重置私密存储。",
-          "description-unavailable": "没有可用的 Secret Service 提供程序。日历事件仅在本次会话中可用。",
+          "description-cancelled": "加密存储提示已取消；日历事件仅在本次会话中可用",
+          "description-error": "无法打开或保存加密的日历事件缓存",
+          "description-locked": "加密存储已锁定或访问被拒绝；请恢复访问后重试",
+          "description-migration": "明文日历事件缓存正等待加密；迁移成功前，现有缓存将继续保留",
+          "description-missing-key": "未找到日历事件缓存密钥；账户凭据使用独立存储（现有缓存文件已保留）",
+          "description-opening": "正在打开加密的日历事件缓存",
+          "description-recovery": "日历事件缓存验证失败或已损坏；请恢复正确的密钥后重试，或重置私密存储",
+          "description-unavailable": "没有可用的 Secret Service 提供程序；日历事件仅在本次会话中可用",
           "label": "日历事件存储"
         },
         "calendar-week-numbers": {
@@ -2616,6 +2659,7 @@
             "label": "网络轮询间隔"
           },
           "stats": {
+            "cpu-freq": "CPU 频率",
             "cpu-temp": "CPU 温度",
             "cpu-usage": "CPU 使用率",
             "disk-free": "磁盘可用空间",
@@ -2750,14 +2794,14 @@
         },
         "clipboard-storage": {
           "button": "重试",
-          "description-cancelled": "Secret Service 解锁提示已取消。剪贴板历史记录仅在本次会话中可用。",
-          "description-error": "无法打开或保存加密的剪贴板历史记录。",
-          "description-locked": "剪贴板密钥存储已锁定或访问被拒绝。请恢复访问后重试。",
-          "description-migration": "明文剪贴板历史记录正等待加密。迁移成功前，现有文件将继续保留。",
-          "description-missing-key": "未找到已配置的加密存储密钥。现有剪贴板历史记录文件已保留。",
-          "description-opening": "正在打开加密的剪贴板历史记录。",
-          "description-recovery": "剪贴板历史记录验证失败或已损坏。请恢复正确的密钥后重试，或重置私密存储。",
-          "description-unavailable": "没有可用的 Secret Service 提供程序。剪贴板历史记录仅在本次会话中可用。",
+          "description-cancelled": "Secret Service 解锁提示已取消；剪贴板历史记录仅在本次会话中可用",
+          "description-error": "无法打开或保存加密的剪贴板历史记录",
+          "description-locked": "剪贴板密钥存储已锁定或访问被拒绝；请恢复访问后重试",
+          "description-migration": "明文剪贴板历史记录正等待加密；迁移成功前，现有文件将继续保留",
+          "description-missing-key": "未找到已配置的加密存储密钥；现有剪贴板历史记录文件已保留",
+          "description-opening": "正在打开加密的剪贴板历史记录",
+          "description-recovery": "剪贴板历史记录验证失败或已损坏；请恢复正确的密钥后重试，或重置私密存储",
+          "description-unavailable": "没有可用的 Secret Service 提供程序；剪贴板历史记录仅在本次会话中可用",
           "label": "剪贴板历史记录存储"
         },
         "date-format": {
@@ -2993,7 +3037,7 @@
       },
       "system": {
         "battery-device-warning-threshold": {
-          "description": "覆盖当前设备的电池警告阈值（设为 0 时禁用设备警告）",
+          "description": "覆盖设备的电池警告阈值（设为 0 时禁用设备警告）",
           "label": "{device} 警告阈值"
         },
         "battery-warning-threshold": {
@@ -3129,7 +3173,7 @@
     "storage-recovery": {
       "button": "重置私密存储",
       "button-confirm": "确认重置存储",
-      "description": "永久删除已保存的剪贴板历史记录和日历事件缓存，并重新打开私密存储。已配置的密钥文件不会被修改。",
+      "description": "永久删除已保存的剪贴板历史记录和日历事件缓存，并重新打开私密存储（已配置的密钥文件不会被修改）",
       "error-delete": "部分私密存储文件无法删除。存储密钥已保留。",
       "error-key": "私密存储文件已删除，但无法重新打开安全存储。请恢复访问后重试。",
       "label": "恢复私密存储",
@@ -3198,6 +3242,7 @@
         "both": "同时显示",
         "compact": "紧凑",
         "count": "数量",
+        "cpu-freq": "CPU 频率",
         "cpu-temp": "CPU 温度",
         "cpu-usage": "CPU 使用率",
         "disk-free": "磁盘可用空间",
@@ -3212,6 +3257,7 @@
         "gpu-temp": "GPU 温度",
         "gpu-usage": "GPU 使用率",
         "gpu-vram": "GPU 显存",
+        "gpu-vram-used": "GPU 显存使用量",
         "graph": "图表",
         "graphic": "图形",
         "hidden": "隐藏",
@@ -3250,7 +3296,7 @@
       },
       "settings": {
         "actions": {
-          "description": "小组件上各项鼠标操作的功能。可选择预设命令、运行 Shell 命令或将其禁用。",
+          "description": "小组件上各项鼠标操作的功能；可选择预设命令、运行 Shell 命令或将其禁用",
           "label": "鼠标操作"
         },
         "active-color": {
@@ -3325,7 +3371,7 @@
           "workspaces-description": "小组件胶囊和工作区胶囊的圆角半径；设为 0 时显示为直角"
         },
         "centered": {
-          "description": "居中显示可视化条，而非边缘对齐",
+          "description": "居中显示频谱条，而非边缘对齐",
           "label": "居中"
         },
         "change-color-on-hover": {
@@ -3458,6 +3504,10 @@
           "description": "隐藏未活动的隐私图标，无任何活动项时隐藏小组件",
           "label": "隐藏未活动项"
         },
+        "hide-passive": {
+          "description": "隐藏 StatusNotifierItem 状态为被动（Passive）的托盘项",
+          "label": "隐藏被动项"
+        },
         "hide-when-empty": {
           "description": "隐藏无窗口的工作区胶囊",
           "label": "无窗口时隐藏",
@@ -3532,6 +3582,10 @@
           "description": "监视的网络接口；留空时统计所有接口的总流量",
           "label": "网络接口"
         },
+        "item-spacing": {
+          "description": "禁用“按工作区分组”时任务栏各项之间的间距",
+          "label": "项目间距"
+        },
         "label": {
           "description": "可选的按钮固定文本",
           "label": "标签"
@@ -3547,6 +3601,10 @@
         "label-show-units": {
           "description": "显示 % / GiB / °C 等单位",
           "label": "显示单位"
+        },
+        "label-source": {
+          "description": "工作区标签显示的内容",
+          "label": "标签内容"
         },
         "labels-only-when-occupied": {
           "description": "在无窗口、非活动工作区上隐藏工作区标签",
@@ -3564,7 +3622,7 @@
         "max-label-chars": {
           "description": "工作区名称显示的最大字符数",
           "label": "最大标签字符数",
-          "workspaces-description": "工作区名称标签的最大字符数"
+          "workspaces-description": "非数字工作区标签的最大字符数"
         },
         "max-length": {
           "description": "小组件最大长度（像素）",
@@ -3630,6 +3688,10 @@
           "description": "当前未运行的已固定应用的不透明度",
           "label": "已固定应用不透明度"
         },
+        "reversed": {
+          "description": "将频谱条按频率从高到低排列",
+          "label": "反向"
+        },
         "scale": {
           "description": "按状态栏内容缩放比例调整小组件大小",
           "label": "缩放"
@@ -3654,6 +3716,10 @@
           "description": "显示所有屏幕上的窗口",
           "label": "包含所有屏幕"
         },
+        "show-all-workspaces": {
+          "description": "显示所有屏幕上的工作区",
+          "label": "包含所有屏幕"
+        },
         "show-caps-lock": {
           "description": "显示大写锁定状态",
           "label": "显示大写锁定"
@@ -3674,6 +3740,10 @@
           "description": "显示小组件的文本标签",
           "label": "显示标签"
         },
+        "show-labels": {
+          "description": "显示工作区文本标签",
+          "label": "显示标签"
+        },
         "show-num-lock": {
           "description": "显示数字锁定状态",
           "label": "显示数字锁定"
@@ -3687,7 +3757,7 @@
           "label": "显示气温"
         },
         "show-unlock-hint": {
-          "description": "在登录框上方显示状态卡片，用于解锁提示和身份验证提示。关闭后仍会显示错误信息和大写锁定提示。",
+          "description": "在登录框上方显示状态卡片，用于解锁提示和身份验证提示；关闭后仍会显示错误信息和大写锁定提示",
           "label": "解锁提示"
         },
         "show-value": {
@@ -3829,7 +3899,7 @@
       "export-config": "导出配置…",
       "export-config-saved": "配置导出已保存。",
       "filter-overridden": "已覆盖",
-      "legacy-config-warning": "旧版配置项已在内存中临时转换：{issue}。请执行 noctalia config validate 命令查看所有需要的更改。",
+      "legacy-config-warning": "旧版配置：{issue}。请修改源配置项。Noctalia 仅在内存中临时兼容。执行 noctalia config validate 命令查看所有必需的更改。",
       "native-title": "Noctalia 设置",
       "no-results": "未找到相关设置",
       "no-results-hint": "请尝试使用其他设置名称或配置键。",

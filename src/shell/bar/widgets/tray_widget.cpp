@@ -166,9 +166,9 @@ namespace {
 
 TrayWidget::TrayWidget(ConfigService& config, TrayService* tray, Options options)
     : m_config(config), m_tray(tray), m_hiddenItems(std::move(options.hiddenItems)),
-      m_pinnedItems(std::move(options.pinnedItems)), m_drawerMode(options.drawerMode),
-      m_itemActivated(std::move(options.itemActivated)), m_barPosition(std::move(options.barPosition)),
-      m_panelGridMode(options.panelGridMode),
+      m_pinnedItems(std::move(options.pinnedItems)), m_hidePassive(options.hidePassive),
+      m_drawerMode(options.drawerMode), m_itemActivated(std::move(options.itemActivated)),
+      m_barPosition(std::move(options.barPosition)), m_panelGridMode(options.panelGridMode),
       m_panelGridColumns(std::clamp<std::size_t>(options.panelGridColumns, 1U, 5U)),
       m_inlineEntryGap(std::max(0.0F, options.inlineEntryGap)), m_matchAdjacentSpacing(options.matchAdjacentSpacing),
       m_customItemSize(options.customItemSize) {
@@ -305,6 +305,7 @@ void TrayWidget::doLayout(Renderer& renderer, float containerWidth, float contai
     }
     m_container->setGap(resolvedInlineEntryGap());
     m_container->layout(renderer);
+    layoutHoverOverlays();
     return;
   }
   const bool vertical = containerHeight > containerWidth;
@@ -328,6 +329,7 @@ void TrayWidget::doLayout(Renderer& renderer, float containerWidth, float contai
 
   m_container->setGap(resolvedInlineEntryGap());
   m_container->layout(renderer);
+  layoutHoverOverlays();
 }
 
 void TrayWidget::doUpdate(Renderer& renderer) {
@@ -451,6 +453,8 @@ void TrayWidget::rebuild(Renderer& renderer) {
   m_loadedImages.clear();
   m_colorizedAppIcons.clear();
 
+  clearHoverOverlays();
+
   while (!m_container->children().empty()) {
     m_container->removeChild(m_container->children().back().get());
   }
@@ -459,24 +463,32 @@ void TrayWidget::rebuild(Renderer& renderer) {
     if (!barCapsuleSpec().hoverHighlight) {
       return;
     }
+
     Box* hoverBoxPtr = nullptr;
     ColorSpec hoverFill = widgetForegroundOr(colorSpecFromRole(ColorRole::OnSurface));
     hoverFill.alpha = 0.0F;
-    const float padding = Style::spaceXs * m_contentScale;
-    area.addChild(
-        ui::box({
-            .out = &hoverBoxPtr,
-            .fill = hoverFill,
-            .radius = resolvedBarCapsuleRadius(size + padding * 2.0F, size + padding * 2.0F),
-            .width = size + padding * 2.0F,
-            .height = size + padding * 2.0F,
-            .configure = [padding](Box& box) {
-              box.setZIndex(-1);
-              box.setHitTestVisible(false);
-              box.setPosition(-padding, -padding);
-            },
-        })
-    );
+    const float padding = barCapsuleSpec().padding * m_contentScale;
+    const float boxSize = size + padding * 2.0F;
+
+    auto hoverBox = ui::box({
+        .out = &hoverBoxPtr,
+        .fill = hoverFill,
+        .radius = resolvedBarCapsuleRadius(boxSize, boxSize),
+        .width = boxSize,
+        .height = boxSize,
+        .configure = [](Box& box) {
+          box.setZIndex(-1);
+          box.setHitTestVisible(false);
+        },
+    });
+
+    if (m_hoverOverlayParent != nullptr) {
+      m_hoverOverlayParent->addChild(std::move(hoverBox));
+      m_hoverOverlays.push_back({.area = &area, .box = hoverBoxPtr, .padding = padding});
+    } else {
+      hoverBoxPtr->setPosition(-padding, -padding);
+      area.addChild(std::move(hoverBox));
+    }
 
     auto progress = std::make_shared<float>(0.0F);
     area.setOnEnter([this, hoverBoxPtr, progress](const InputArea::PointerData&) {
@@ -526,7 +538,7 @@ void TrayWidget::rebuild(Renderer& renderer) {
     m_drawerChevronGlyph.clear();
     bool hasDrawerItems = false;
     for (const auto& item : m_items) {
-      if (tray::isPassiveStatus(item) || isHiddenItem(item) || isPinnedItem(item)) {
+      if ((m_hidePassive && tray::isPassiveStatus(item)) || isHiddenItem(item) || isPinnedItem(item)) {
         continue;
       }
       hasDrawerItems = true;
@@ -581,7 +593,7 @@ void TrayWidget::rebuild(Renderer& renderer) {
   Flex* gridRow = nullptr;
   std::size_t gridCol = 0;
   for (const auto& item : m_items) {
-    if (tray::isPassiveStatus(item) || isHiddenItem(item)) {
+    if ((m_hidePassive && tray::isPassiveStatus(item)) || isHiddenItem(item)) {
       continue;
     }
     if (m_drawerMode && !isPinnedItem(item)) {
@@ -1032,4 +1044,63 @@ std::string TrayWidget::iconForItem(const TrayItemInfo& item) const {
     return "warning";
   }
   return "menu-2";
+}
+void TrayWidget::layoutHoverOverlays() {
+  if (m_hoverOverlayParent == nullptr || m_hoverOverlays.empty()) {
+    return;
+  }
+  float underlayX = 0.0F;
+  float underlayY = 0.0F;
+  Node::absolutePosition(m_hoverOverlayParent, underlayX, underlayY);
+
+  for (auto& entry : m_hoverOverlays) {
+    if (entry.area == nullptr || entry.box == nullptr) {
+      continue;
+    }
+    float areaX = 0.0F;
+    float areaY = 0.0F;
+    Node::absolutePosition(entry.area, areaX, areaY);
+
+    const float mainExtent = m_isVertical ? entry.area->height() : entry.area->width();
+
+    const float hoverW = m_isVertical ? m_capsuleCross : mainExtent + 2.0F * entry.padding;
+    const float hoverH = m_isVertical ? mainExtent + 2.0F * entry.padding : m_capsuleCross;
+
+    entry.box->setSize(hoverW, hoverH);
+    entry.box->setRadius(resolvedBarCapsuleRadius(hoverW, hoverH));
+
+    float boxX = areaX - underlayX;
+    float boxY = areaY - underlayY;
+
+    if (m_isVertical) {
+      boxX += (entry.area->width() - m_capsuleCross) * 0.5F;
+      boxY -= entry.padding;
+    } else {
+      boxX -= entry.padding;
+      boxY += (entry.area->height() - m_capsuleCross) * 0.5F;
+    }
+
+    entry.box->setPosition(boxX, boxY);
+  }
+}
+
+// The hover overlay boxes live in `m_hoverOverlayParent` (an external node that outlives us or is
+// wiped by `attachWidgetsToSections` before the next widget batch), and the entries' `area`
+// pointers are inside our own scene subtree, which the bar destroys *before* clearing the widget
+// vector. Touching either from the destructor is redundant at best and a use-after-free at worst.
+TrayWidget::~TrayWidget() = default;
+
+void TrayWidget::clearHoverOverlays() {
+  if (m_hoverOverlayParent != nullptr) {
+    for (auto& entry : m_hoverOverlays) {
+      if (entry.area != nullptr) {
+        entry.area->setOnEnter(nullptr);
+        entry.area->setOnLeave(nullptr);
+      }
+      if (entry.box != nullptr) {
+        m_hoverOverlayParent->removeChild(entry.box);
+      }
+    }
+  }
+  m_hoverOverlays.clear();
 }

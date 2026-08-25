@@ -125,10 +125,10 @@ namespace settings {
 
   PluginStoreContent::PluginStoreContent(
       std::vector<StoreCatalogEntry> catalog, ConfigService* config, std::unordered_set<std::string> onDiskIds,
-      PluginStoreCallbacks callbacks, scripting::PluginFileCache* fileCache
+      PluginStoreCallbacks callbacks, scripting::PluginFileCache* fileCache, ScrollViewState* scrollState
   )
       : m_catalog(std::move(catalog)), m_config(config), m_onDiskIds(std::move(onDiskIds)),
-        m_callbacks(std::move(callbacks)), m_fileCache(fileCache) {
+        m_callbacks(std::move(callbacks)), m_fileCache(fileCache), m_scrollState(scrollState) {
     if (m_config != nullptr) {
       if (const std::optional<std::string> sort = m_config->stateString("plugin_store", "sort")) {
         m_sortMode = sortModeFromState(*sort);
@@ -141,6 +141,19 @@ namespace settings {
   }
 
   PluginStoreContent::~PluginStoreContent() = default;
+
+  void PluginStoreContent::detachGrid() noexcept {
+    m_grid = nullptr;
+    m_countLabel = nullptr;
+    m_sortButton = nullptr;
+  }
+
+  void PluginStoreContent::requestRebuild() {
+    detachGrid();
+    if (m_onRebuildNeeded) {
+      m_onRebuildNeeded();
+    }
+  }
 
   void PluginStoreContent::setOnRebuildNeeded(std::function<void()> cb) { m_onRebuildNeeded = std::move(cb); }
 
@@ -452,9 +465,7 @@ namespace settings {
                 }
 
                 applyFilter();
-                if (m_onRebuildNeeded) {
-                  m_onRebuildNeeded();
-                }
+                requestRebuild();
               },
           })
       );
@@ -469,16 +480,15 @@ namespace settings {
       toolbar->addChild(
           ui::button({
               .text = i18n::tr("settings.plugins.store.categories"),
-              .glyph = m_tagFiltersCollapsed ? std::string("chevron-right") : std::string("chevron-down"),
+              .glyph = m_tagFiltersCollapsed ? std::string(Style::rtl() ? "chevron-left" : "chevron-right")
+                                             : std::string("chevron-down"),
               .fontSize = Style::fontSizeCaption * scale,
               .glyphSize = Style::fontSizeCaption * scale,
               .contentAlign = ButtonContentAlign::Start,
               .variant = ButtonVariant::Ghost,
               .onClick = [this]() {
                 m_tagFiltersCollapsed = !m_tagFiltersCollapsed;
-                if (m_onRebuildNeeded) {
-                  m_onRebuildNeeded();
-                }
+                requestRebuild();
               },
           })
       );
@@ -496,9 +506,7 @@ namespace settings {
               .onClick = [this, tag = std::move(tag)]() {
                 m_selectedTag = tag;
                 applyFilter();
-                if (m_onRebuildNeeded) {
-                  m_onRebuildNeeded();
-                }
+                requestRebuild();
               },
           });
           tagButtons.push_back(std::move(btn));
@@ -566,6 +574,7 @@ namespace settings {
 
     auto grid = ui::virtualGridView({
         .out = &m_grid,
+        .state = m_scrollState,
         .minCellWidth = 200.0F * scale,
         .cellHeight = 215.0F * scale,
         .squareCells = false,
@@ -859,38 +868,35 @@ namespace settings {
   }
 
   void PluginStoreContent::openDetail(std::size_t filteredIndex) {
+    if (filteredIndex >= m_filteredIndices.size()) {
+      return;
+    }
     m_detailIndex = filteredIndex;
     m_selectedPluginId = m_catalog[m_filteredIndices[filteredIndex]].entry.id;
     m_detailReadme.clear();
     m_detailReadmeLoading = false;
 
-    if (filteredIndex < m_filteredIndices.size()) {
-      const auto& storeEntry = m_catalog[m_filteredIndices[filteredIndex]];
-      if (m_fileCache != nullptr) {
-        m_detailReadmeLoading = true;
-        std::string path = m_fileCache->resolve(storeEntry.entry.id, storeEntry.sourceConfig, "README.md");
-        if (!path.empty()) {
-          std::ifstream f(path);
-          if (f.is_open()) {
-            m_detailReadme = std::string(std::istreambuf_iterator<char>(f), {});
-          }
-          m_detailReadmeLoading = false;
+    const auto& storeEntry = m_catalog[m_filteredIndices[filteredIndex]];
+    if (m_fileCache != nullptr) {
+      m_detailReadmeLoading = true;
+      std::string path = m_fileCache->resolve(storeEntry.entry.id, storeEntry.sourceConfig, "README.md");
+      if (!path.empty()) {
+        std::ifstream f(path);
+        if (f.is_open()) {
+          m_detailReadme = std::string(std::istreambuf_iterator<char>(f), {});
         }
+        m_detailReadmeLoading = false;
       }
     }
 
-    if (m_onRebuildNeeded) {
-      m_onRebuildNeeded();
-    }
+    requestRebuild();
   }
 
   void PluginStoreContent::closeDetail() {
     m_detailIndex.reset();
     m_detailReadme.clear();
     m_detailReadmeLoading = false;
-    if (m_onRebuildNeeded) {
-      m_onRebuildNeeded();
-    }
+    requestRebuild();
   }
 
   void PluginStoreContent::selectIndex(std::size_t index) {
@@ -1053,9 +1059,7 @@ namespace settings {
           m_detailReadme = std::string(std::istreambuf_iterator<char>(f), {});
         }
         m_detailReadmeLoading = false;
-        if (m_onRebuildNeeded) {
-          m_onRebuildNeeded();
-        }
+        requestRebuild();
       }
     }
   }

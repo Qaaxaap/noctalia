@@ -23,9 +23,11 @@ class SystemMonitorService;
 enum class DesktopSysmonStat : std::uint8_t {
   CpuUsage,
   CpuTemp,
+  CpuFreq,
   GpuTemp,
   GpuUsage,
   GpuVram,
+  GpuVramUsed,
   RamPct,
   SwapPct,
   NetRx,

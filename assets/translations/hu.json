@@ -1411,8 +1411,6 @@
         "deprecated": "elavult",
         "empty": "Nincs engedélyezett bővítmény",
         "incompatible-plugin-api": "Összeférhetetlen bővítmény-API",
-        "loading": "Bővítmények betöltése…",
-        "refreshing": "Bővítmények frissítése…",
         "remove": "Bővítmény eltávolítása",
         "requires": "Szükséges: {dependencies}",
         "title": "Bővítmények",
@@ -1464,7 +1462,7 @@
         "open-source": "A bővítmény forráskód-tárának megnyitása",
         "results-count": "{count} bővítmény",
         "search-placeholder": "Bővítmények keresése…",
-        "source-all": "Mind",
+        "source-all": "Összes forrás",
         "title": "Bővítményáruház"
       }
     },

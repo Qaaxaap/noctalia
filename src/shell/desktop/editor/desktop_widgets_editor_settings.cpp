@@ -405,6 +405,16 @@ namespace {
   std::unique_ptr<Flex> makeStringListRow(
       std::string_view labelText, const std::string& key, std::vector<std::string> items, DesktopWidgetsEditor* editor
   ) {
+
+    auto row = ui::column({.align = FlexAlign::Stretch, .gap = Style::spaceXs, .fillWidth = true});
+    row->addChild(
+        ui::label({
+            .text = std::string(labelText),
+            .fontSize = Style::fontSizeCaption,
+            .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+        })
+    );
+
     auto listEditor = std::make_unique<ListEditor>();
     listEditor->setAddPlaceholder(i18n::tr("settings.controls.list.add-entry-placeholder"));
     listEditor->setItems(items);
@@ -429,7 +439,8 @@ namespace {
       std::swap(items[from], items[to]);
       editor->applySettingChange(key, items);
     });
-    return makeRow(labelText, std::move(listEditor));
+    row->addChild(std::move(listEditor));
+    return row;
   }
 
   std::unique_ptr<Flex> makeStringMapRow(
@@ -937,8 +948,13 @@ void DesktopWidgetsEditor::applySettingChange(const std::string& key, WidgetSett
     if (view.transformNode == nullptr) {
       return;
     }
+    if (surface->surface == nullptr || m_renderContext == nullptr) {
+      return;
+    }
+    m_renderContext->makeCurrent(surface->surface->renderTarget());
+    Renderer& renderer = surface->surface->renderTarget().renderer();
 
-    if (view.widget != nullptr && view.widget->applySetting(key, value, state->settings, *m_renderContext)) {
+    if (view.widget != nullptr && view.widget->applySetting(key, value, state->settings, renderer)) {
       applyViewState(view, *state, true);
       updateSelectionVisuals(*surface);
       if (rebuildInspector) {
@@ -990,12 +1006,15 @@ void DesktopWidgetsEditor::applySettingChange(const std::string& key, WidgetSett
       }
     });
     newWidget->setBox(state->boxWidth, state->boxHeight);
-    newWidget->update(*m_renderContext);
-    newWidget->layout(*m_renderContext);
+    newWidget->update(renderer);
+    newWidget->layout(renderer);
 
     view.intrinsicWidth = std::max(1.0F, newWidget->intrinsicWidth());
     view.intrinsicHeight = std::max(1.0F, newWidget->intrinsicHeight());
-    view.transformNode->addChild(newWidget->releaseRoot());
+    auto widgetRoot = newWidget->releaseRoot();
+    widgetRoot->setHitTestVisible(false);
+    widgetRoot->setExcludeSubtreeFromTabOrder(true);
+    view.transformNode->addChild(std::move(widgetRoot));
     view.widget = std::move(newWidget);
 
     applyViewState(view, *state, false);
@@ -1039,6 +1058,7 @@ void DesktopWidgetsEditor::resetSelectedWidgetSettings() {
 void DesktopWidgetsEditor::buildInspector(
     OverlaySurface& surface, Node& root, const DesktopWidgetState& selectedState
 ) {
+  Renderer& renderer = surface.surface->renderTarget().renderer();
   auto handleArea = ui::inputArea({});
   handleArea->setParticipatesInLayout(false);
   handleArea->setZIndex(1);
@@ -1159,7 +1179,7 @@ void DesktopWidgetsEditor::buildInspector(
 
   surface.inspector = panelPtr;
   root.addChild(std::move(panel));
-  panelPtr->layout(*m_renderContext);
+  panelPtr->layout(renderer);
   handleAreaPtr->setPosition(0.0F, 0.0F);
   handleAreaPtr->setFrameSize(dragHandlePtr->width(), dragHandlePtr->height());
 

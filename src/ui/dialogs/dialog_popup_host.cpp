@@ -310,7 +310,7 @@ bool DialogPopupHost::onPointerEvent(const PointerEvent& event) {
     } else {
       m_inputDispatcher.pointerMotion(localX, localY, event.serial);
     }
-    m_inputDispatcher.pointerButton(localX, localY, event.button, event.pressed);
+    m_inputDispatcher.pointerButton(localX, localY, event.button, event.pressed, event.serial, event.time, event.touch);
     break;
   case PointerEvent::Type::Axis:
     if (captured) {
@@ -380,6 +380,8 @@ xdg_surface* DialogPopupHost::xdgSurface() const noexcept {
 std::uint32_t DialogPopupHost::width() const noexcept { return m_surface != nullptr ? m_surface->width() : 0; }
 
 std::uint32_t DialogPopupHost::height() const noexcept { return m_surface != nullptr ? m_surface->height() : 0; }
+
+Renderer& DialogPopupHost::renderer() const noexcept { return m_surface->renderTarget().renderer(); }
 
 void DialogPopupHost::cancel() {
   if (m_surface == nullptr) {

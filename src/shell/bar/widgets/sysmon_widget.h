@@ -30,9 +30,11 @@ struct SystemStats;
 enum class SysmonStat {
   CpuUsage,
   CpuTemp,
+  CpuFreq,
   GpuTemp,
   GpuUsage,
   GpuVram,
+  GpuVramUsed,
   RamUsed,
   RamPct,
   SwapPct,

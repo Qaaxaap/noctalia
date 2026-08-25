@@ -1083,7 +1083,7 @@ namespace settings {
     entries.push_back(makeEntry(
         SettingsSection::Dock, "pinned-apps", tr("settings.schema.dock.pinned-apps.label"),
         tr("settings.schema.dock.pinned-apps.description"), {"dock", "pinned"}, ListSetting{.items = cfg.dock.pinned},
-        "favorites"
+        "pinned apps dock"
     ));
 
     // Panels
@@ -1219,9 +1219,20 @@ namespace settings {
         ToggleSetting{cfg.shell.launcher.showIcons}, "launcher app icons hide"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-app-origin-indicator.label"),
+        tr("settings.schema.panels.launcher-app-origin-indicator.description"),
+        {"shell", "launcher", "show_app_origin_indicator"}, ToggleSetting{cfg.shell.launcher.showAppOriginIndicator},
+        "launcher app origin indicator"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-app-grid.label"),
         tr("settings.schema.panels.launcher-app-grid.description"), {"shell", "launcher", "app_grid"},
         ToggleSetting{cfg.shell.launcher.appGrid}, "launcher app grid icons view"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-app-actions.label"),
+        tr("settings.schema.panels.launcher-app-actions.description"), {"shell", "launcher", "show_app_actions"},
+        ToggleSetting{cfg.shell.launcher.showAppActions}, "launcher app actions show"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-compact.label"),
@@ -1232,6 +1243,11 @@ namespace settings {
         SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-sort-by-usage.label"),
         tr("settings.schema.panels.launcher-sort-by-usage.description"), {"shell", "launcher", "sort_by_usage"},
         ToggleSetting{cfg.shell.launcher.sortByUsage}, "launcher sort usage recently used frequency"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-pinned-apps.label"),
+        tr("settings.schema.panels.launcher-pinned-apps.description"), {"shell", "launcher", "pinned"},
+        ListSetting{.items = cfg.shell.launcher.pinned}, "launcher pinned apps"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Launcher, "launcher", tr("settings.schema.panels.launcher-currency-exchange.label"),
@@ -1365,20 +1381,20 @@ namespace settings {
 
     // Control Center
     entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "general", tr("settings.schema.panels.placement-control-center.label"),
+        SettingsSection::ControlCenter, "layout", tr("settings.schema.panels.placement-control-center.label"),
         tr("settings.schema.panels.placement-control-center.description"),
         {"shell", "panel", "control_center_placement"},
         asSegmented(enumSelect(kPanelPlacements, cfg.shell.panel.controlCenterPlacement)),
         "attached floating bar panel position"
     ));
     entries.push_back(panelPositionEntry(
-        SettingsSection::ControlCenter, "general", "control_center",
+        SettingsSection::ControlCenter, "layout", "control_center",
         "settings.schema.panels.position-control-center.label",
         "settings.schema.panels.position-control-center.description", cfg.shell.panel.controlCenterPosition,
         &ShellConfig::PanelConfig::controlCenterPlacement
     ));
     entries.push_back(panelBarAlignmentEntry(
-        SettingsSection::ControlCenter, "general", "control_center",
+        SettingsSection::ControlCenter, "layout", "control_center",
         "settings.schema.panels.open-near-click-control-center.label",
         "settings.schema.panels.open-near-click-control-center.description", cfg.shell.panel.openNearClickControlCenter,
         &ShellConfig::PanelConfig::controlCenterPlacement, &ShellConfig::PanelConfig::controlCenterPosition
@@ -1388,35 +1404,22 @@ namespace settings {
           sliderFor(cfg.controlCenter.width, noctalia::config::schema::kControlCenterWidthRange, true);
       width.valueSuffix = "px";
       entries.push_back(makeEntry(
-          SettingsSection::ControlCenter, "general", tr("settings.schema.panels.control-center-width.label"),
+          SettingsSection::ControlCenter, "layout", tr("settings.schema.panels.control-center-width.label"),
           tr("settings.schema.panels.control-center-width.description"), {"control_center", "width"}, std::move(width),
           "size dimension wide narrow"
       ));
     }
     entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "general", tr("settings.schema.panels.control-center-sidebar.label"),
+        SettingsSection::ControlCenter, "navigation", tr("settings.schema.panels.control-center-sidebar.label"),
         tr("settings.schema.panels.control-center-sidebar.description"), {"control_center", "sidebar"},
         asSegmented(enumSelect(kControlCenterSidebarModes, cfg.controlCenter.sidebarMode)),
         "full compact none sidebar icons narrow hidden"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "general", tr("settings.schema.panels.control-center-sidebar-section.label"),
+        SettingsSection::ControlCenter, "navigation", tr("settings.schema.panels.control-center-sidebar-section.label"),
         tr("settings.schema.panels.control-center-sidebar-section.description"), {"control_center", "sidebar_section"},
         asSegmented(enumSelect(kControlCenterSidebarModes, cfg.controlCenter.sidebarSectionMode)),
         "full compact none sidebar icons narrow hidden tab direct widget shortcut"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "general", tr("settings.schema.panels.home-shortcuts.label"),
-        tr("settings.schema.panels.home-shortcuts.description"), {"control_center", "shortcuts"},
-        ShortcutListSetting{
-            .items = cfg.controlCenter.shortcuts, .suggestedOptions = controlCenterShortcutOptions(cfg), .maxItems = 6
-        },
-        "quick settings shortcuts toggles wifi bluetooth caffeine night light dnd power media weather clipboard"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::ControlCenter, "general", tr("settings.schema.panels.home-shortcuts-show-labels.label"),
-        tr("settings.schema.panels.home-shortcuts-show-labels.description"), {"control_center", "show_shortcut_labels"},
-        ToggleSetting{cfg.controlCenter.showShortcutLabels}, "shortcuts labels text hide show titles"
     ));
     {
       MultiSelectSetting tabs;
@@ -1431,11 +1434,29 @@ namespace settings {
       }
       tabs.persistUnselected = true;
       entries.push_back(makeEntry(
-          SettingsSection::ControlCenter, "general", tr("settings.schema.panels.control-center-tabs.label"),
+          SettingsSection::ControlCenter, "navigation", tr("settings.schema.panels.control-center-tabs.label"),
           tr("settings.schema.panels.control-center-tabs.description"), {"control_center", "hidden_tabs"},
           std::move(tabs), "tabs sections visible hide show display brightness media audio network power"
       ));
     }
+    entries.push_back(makeEntry(
+        SettingsSection::ControlCenter, "home", tr("settings.schema.panels.home-shortcuts.label"),
+        tr("settings.schema.panels.home-shortcuts.description"), {"control_center", "shortcuts"},
+        ShortcutListSetting{
+            .items = cfg.controlCenter.shortcuts, .suggestedOptions = controlCenterShortcutOptions(cfg), .maxItems = 6
+        },
+        "quick settings shortcuts toggles wifi bluetooth caffeine night light dnd power media weather clipboard"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::ControlCenter, "home", tr("settings.schema.panels.home-shortcuts-show-labels.label"),
+        tr("settings.schema.panels.home-shortcuts-show-labels.description"), {"control_center", "show_shortcut_labels"},
+        ToggleSetting{cfg.controlCenter.showShortcutLabels}, "shortcuts labels text hide show titles"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::ControlCenter, "home", tr("settings.schema.panels.home-session-button.label"),
+        tr("settings.schema.panels.home-session-button.description"), {"control_center", "show_session_button"},
+        ToggleSetting{cfg.controlCenter.showSessionButton}, "session button show hide"
+    ));
 
     // Desktop
     entries.push_back(makeEntry(
@@ -2309,6 +2330,10 @@ namespace settings {
           mon.cpuTempCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::CpuTemp), true, "°C"
       );
       addThresholdPair(
+          "cpu_freq", "settings.schema.services.system-monitor.stats.cpu-freq", mon.cpuFreqActivityThreshold,
+          mon.cpuFreqCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::CpuFreq), false, "GHz"
+      );
+      addThresholdPair(
           "gpu_usage", "settings.schema.services.system-monitor.stats.gpu-usage", mon.gpuUsageActivityThreshold,
           mon.gpuUsageCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::GpuUsage), true, "%"
       );
@@ -2945,7 +2970,8 @@ namespace settings {
         SettingsSection::Notifications, "filtering", tr("settings.schema.notifications.filters.label"),
         tr("settings.schema.notifications.filters.description"), {"notification", "filter"},
         NotificationFiltersSetting{.items = cfg.notification.filters},
-        "filter blacklist suppress toast history sound app name desktop entry category urgency"
+        "filter blacklist suppress toast history sound dnd bypass do not disturb app name desktop entry category "
+        "urgency"
     ));
 
     // Bar — register every configured bar so global search can surface settings from all of them.

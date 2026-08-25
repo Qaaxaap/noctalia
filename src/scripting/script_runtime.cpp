@@ -166,6 +166,9 @@ namespace scripting {
         case ScriptSideEffectKind::SetWallpaper:
           api.invokeSetWallpaper(effect.title, effect.body);
           break;
+        case ScriptSideEffectKind::SetWallpaperMask:
+          api.invokeSetWallpaperMask(effect.hostId, effect.title, effect.body, effect.extra);
+          break;
         case ScriptSideEffectKind::TogglePanel:
           if (togglePanelCallback) {
             togglePanelCallback(effect.title);
@@ -876,6 +879,7 @@ namespace scripting {
       result.timedOut = host != nullptr && host->lastCallTimedOut();
       result.patch = bindingContext.patch;
       result.sideEffects = bindingContext.sideEffects;
+      result.contextMenuRequest = bindingContext.contextMenuRequest;
       result.hasOnIpcKnown = false;
       if (!ok) {
         // The VM's own message names the failing chunk and line, which for a bad
