@@ -12,7 +12,6 @@
 #include <pipewire/keys.h>
 #include <pipewire/properties.h>
 #include <pipewire/stream.h>
-#include <pipewire/version.h>
 #include <spa/param/audio/format.h>
 #include <spa/param/audio/raw-utils.h>
 #include <spa/param/audio/raw.h>
@@ -171,12 +170,7 @@ bool PipeWireSpectrum::Stream::start() {
   auto* props = pw_properties_new(
       PW_KEY_MEDIA_TYPE, "Audio", PW_KEY_MEDIA_CATEGORY, "Capture", PW_KEY_MEDIA_NAME, "Noctalia Spectrum",
       PW_KEY_APP_NAME, "Noctalia Spectrum", PW_KEY_STREAM_MONITOR, "true", PW_KEY_STREAM_CAPTURE_SINK, "true",
-      PW_KEY_MEDIA_ROLE, "Music", PW_KEY_TARGET_OBJECT, m_targetObject.c_str(),
-#if PW_CHECK_VERSION(1, 7, 0)
-      PW_KEY_NODE_PASSIVE, "in-follow",
-#else
-      PW_KEY_NODE_PASSIVE, "true",
-#endif
+      PW_KEY_MEDIA_ROLE, "Music", PW_KEY_TARGET_OBJECT, m_targetObject.c_str(), PW_KEY_NODE_PASSIVE, "in-follow",
       nullptr
   );
   if (props == nullptr) {
