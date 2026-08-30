@@ -2947,6 +2947,10 @@
           "description": "Show an OSD popup when Wi-Fi is toggled",
           "label": "Wi-Fi"
         },
+        "osd-media-cooldown": {
+          "description": "Minimum delay between media (now playing) popups; 0 disables the cooldown",
+          "label": "Media Cooldown"
+        },
         "osd-monitors": {
           "description": "Choose which monitors show OSD popups; leave empty to show on all monitors",
           "label": "Monitors"

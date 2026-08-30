@@ -804,6 +804,15 @@ void Application::initNotificationAndOsd() {
   m_keyboardLayoutOsd.bindOverlay(m_osdOverlay);
   m_keyboardLayoutOsd.prime(m_compositorPlatform);
   m_mediaOsd.bindOverlay(m_osdOverlay);
+  m_mediaOsd.configure(m_configService.config());
+  m_configService.addReloadCallback(
+      [this]() {
+        if (m_configService.lastChange().osd) {
+          m_mediaOsd.configure(m_configService.config());
+        }
+      },
+      "media-osd-cooldown"
+  );
   m_privacyOsd.bindOverlay(m_osdOverlay);
   m_privacyOsd.configure(m_configService.config());
   m_configService.addReloadCallback(

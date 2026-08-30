@@ -1,10 +1,11 @@
 #include "shell/osd/media_osd.h"
 
+#include "config/config_types.h"
 #include "dbus/mpris/mpris_service.h"
-#include "shell/osd/osd_overlay.h"
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
 
 namespace {
 
@@ -37,6 +38,63 @@ namespace {
 
 void MediaOsd::bindOverlay(OsdOverlay& overlay) { m_overlay = &overlay; }
 
+void MediaOsd::configure(const Config& config) {
+  m_cooldown = std::chrono::milliseconds(std::max<std::int64_t>(0, config.osd.mediaCooldownMs));
+
+  // A reload may have shortened the cooldown below what the pending flush is
+  // waiting on; release anything that is no longer suppressed.
+  if (m_pendingContent.has_value() && !inCooldown(std::chrono::steady_clock::now())) {
+    flushPending();
+  }
+}
+
+bool MediaOsd::inCooldown(std::chrono::steady_clock::time_point now) const noexcept {
+  return m_cooldown.count() > 0 && now < m_cooldownUntil;
+}
+
+void MediaOsd::pushTrackContent(const OsdContent& content) {
+  if (m_overlay == nullptr) {
+    return;
+  }
+  const auto now = std::chrono::steady_clock::now();
+  if (inCooldown(now)) {
+    // Keep only the most recent trigger; it re-appears once the cooldown ends.
+    m_pendingContent = content;
+    if (m_pendingFlushTimer == 0) {
+      schedulePendingFlush(m_cooldownUntil);
+    }
+    return;
+  }
+  m_overlay->show(content);
+  m_cooldownUntil = now + m_cooldown;
+}
+
+void MediaOsd::schedulePendingFlush(std::chrono::steady_clock::time_point when) {
+  const auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(when - std::chrono::steady_clock::now());
+  const std::weak_ptr<void> aliveGuard = m_aliveGuard;
+  m_pendingFlushTimer = TimerManager::instance().start(m_pendingFlushTimer, delay, [this, aliveGuard]() {
+    if (aliveGuard.expired()) {
+      return;
+    }
+    m_pendingFlushTimer = 0;
+    flushPending();
+  });
+}
+
+void MediaOsd::flushPending() {
+  if (!m_pendingContent.has_value()) {
+    return;
+  }
+  const auto now = std::chrono::steady_clock::now();
+  if (inCooldown(now)) {
+    schedulePendingFlush(m_cooldownUntil);
+    return;
+  }
+  OsdContent content = std::move(*m_pendingContent);
+  m_pendingContent.reset();
+  pushTrackContent(content);
+}
+
 void MediaOsd::onMprisChanged(const MprisService& service) {
   const auto activePlayerOpt = service.activePlayer();
   if (activePlayerOpt.has_value()) {
@@ -49,9 +107,7 @@ void MediaOsd::onMprisChanged(const MprisService& service) {
       m_hasData = true;
     } else if (activePlayer.playbackStatus == "Playing" && osdData != m_lastData) {
       m_lastData = osdData;
-      if (m_overlay != nullptr) {
-        m_overlay->show(makeMprisContent(osdData));
-      }
+      pushTrackContent(makeMprisContent(osdData));
     }
   }
 

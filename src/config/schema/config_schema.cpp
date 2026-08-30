@@ -73,6 +73,7 @@ namespace noctalia::config::schema {
         field(&OsdConfig::offsetX, "offset_x", Range<std::int64_t>{0, std::nullopt}),
         field(&OsdConfig::offsetY, "offset_y", Range<std::int64_t>{0, std::nullopt}),
         field(&OsdConfig::monitors, "monitors"),
+        field(&OsdConfig::mediaCooldownMs, "media_cooldown_ms", Range<std::int64_t>{0, std::nullopt}),
         subTable(&OsdConfig::kinds, "kinds", osdKindsSchema()),
     };
     return s;

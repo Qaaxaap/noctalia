@@ -2015,6 +2015,18 @@ namespace settings {
         "monitor output display screen hud overlay"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Osd, "osd", tr("settings.schema.shell.osd-media-cooldown.label"),
+        tr("settings.schema.shell.osd-media-cooldown.description"), {"osd", "media_cooldown_ms"},
+        StepperSetting{
+            .value = cfg.osd.mediaCooldownMs,
+            .minValue = 0,
+            .maxValue = 10000,
+            .step = 250,
+            .valueSuffix = "ms",
+        },
+        "hud overlay media now playing cooldown debounce"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Osd, "kinds", tr("settings.schema.shell.osd-kinds-volume.label"),
         tr("settings.schema.shell.osd-kinds-volume.description"), {"osd", "kinds", "volume"},
         ToggleSetting{cfg.osd.kinds.volume}, "hud overlay audio output input microphone"

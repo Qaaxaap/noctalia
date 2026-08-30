@@ -735,6 +735,8 @@ struct OsdConfig {
   int offsetX = 20;
   int offsetY = 8;
   std::vector<std::string> monitors;
+  // Cooldown between media (now playing) popups, in milliseconds; 0 = disabled.
+  std::int32_t mediaCooldownMs = 0;
   OsdKindsConfig kinds;
 
   bool operator==(const OsdConfig&) const = default;

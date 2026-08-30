@@ -195,6 +195,7 @@ background_opacity = 0.97           # background opacity of OSD popups
 offset_x = 20                       # absolute horizontal margin from the screen edge
 offset_y = 8                        # absolute vertical margin from the screen edge
 # monitors = ["DP-1"]               # connector names; omit or leave empty for all monitors
+media_cooldown_ms = 0               # cooldown between media (now playing) popups in ms; 0 = no cooldown
 
 [osd.kinds]
 volume = true                       # master volume OSD toggle
@@ -209,7 +210,9 @@ nightlight = true                   # night light toggle
 dnd = true                          # Do Not Disturb toggle
 lock_keys = true                    # Caps/Num/Scroll Lock changes; disable to stop polling when no widget uses them
 keyboard_layout = true              # input keyboard layout changes
+media = true                        # now playing (track change) popups
 privacy = true                      # microphone/camera/screen-share capture changes
+keyboard_backlight = true           # keyboard backlight changes
 
 # ── Lock Screen ───────────────────────────────────────────────────────────────
 
